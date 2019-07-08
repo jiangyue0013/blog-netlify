@@ -7,4 +7,5 @@ public/
 .deploy*/"/public" 
 "/node_modules" 
 "/.vscode" 
-package.json
+"package.json"
+"/.deploy_git" 

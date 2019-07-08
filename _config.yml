@@ -3,8 +3,8 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 狂野春梦
-subtitle: 冷暖自知
+title: 姜悦的博客
+subtitle: 这世界唯一不变的事情就是这世界一直在改变。
 description:
 keywords:
 author: Jiang Yue
@@ -13,7 +13,7 @@ timezone: asia/shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://211.159.153.80/
+url: http://www.jiangyue0013.com/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
