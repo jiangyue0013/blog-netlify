@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>姜悦的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="姜悦的博客">
+<meta property="og:url" content="http://www.jiangyue0013.com/page/2/index.html">
+<meta property="og:site_name" content="姜悦的博客">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="姜悦的博客">
+  
+    <link rel="alternate" href="/atom.xml" title="姜悦的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">姜悦的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">这世界唯一不变的事情就是这世界一直在改变。</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.jiangyue0013.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-一个二分查找的小问题--由python四舍五入引起" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/16/一个二分查找的小问题--由python四舍五入引起/" class="article-date">
+  <time datetime="2019-05-16T10:10:24.000Z" itemprop="datePublished">2019-05-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/16/一个二分查找的小问题--由python四舍五入引起/">一个二分查找的小问题--由python四舍五入引起</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在看算法图解的过程了解到了很多算法的知识，但在中间也遇到了一个小问题。<br>下面我们就看一下这个小问题时怎么解决的。<br>下面是书中的源码：</p>
+<pre><code>def binary_search(list, item):
+    low =  0
+    high = len(list)
+    while low &lt;= high:
+        mid = (low + high) / 2
+        guess = list[mid]
+        if guess == item:
+            return mid
+        if guess &gt; item:
+            high = mid - 1
+        else:
+            low = mid - 1
+    return None</code></pre><p>当我们用下面的数据运行时:</p>
+<pre><code>list = [1, 2, 3, 4, 5]
+item = 3
+position = binary_search(list, item)
+print(position)</code></pre><p>会导致如下错误：</p>
+<pre><code>Traceback (most recent call last):
+  File &quot;binary_search.py&quot;, line 17, in &lt;module&gt;
+    position = binary_search(list, item)
+  File &quot;binary_search.py&quot;, line 6, in binary_search
+    guess = list[mid]
+TypeError: list indices must be integers or slices, not float</code></pre><p>上面信息的意思是索引类型错误，索引必须为整型而不是float型。<br>这是因为python中除法即“/”会自动转换类型。将无法整除的数字转换成浮点型。<br>下面是我一开始想到的解决办法：</p>
+<pre><code>def binary_search(list, item):
+    low =  0
+    high = len(list)
+    while low &lt;= high:
+        mid = int((low + high) / 2)  # 将结果加一个类型转换即可
+        guess = list[mid]
+        if guess == item:
+            return mid
+        if guess &gt; item:
+            high = mid - 1
+        else:
+            low = mid - 1
+    return None</code></pre><p>但当使用下面的数据进行测试时：</p>
+<pre><code>list = [1, 2, 3, 4, 5]
+item = 5
+position = binary_search(list, item)
+print(position)</code></pre><p>结果就是循环不会停止了。<br>为了找到问题出在哪里。我们在循环体中加一个pirnt语句输出一下mid</p>
+<pre><code>def binary_search(list, item):
+    low =  0
+    high = len(list)
+    while low &lt;= high:
+        mid = int((low + high) / 2)  # 将结果加一个类型转换即可
+        print(mid)
+        guess = list[mid]
+        if guess == item:
+            return mid
+        if guess &gt; item:
+            high = mid - 1
+        else:
+            low = mid - 1
+    return None</code></pre><p>还是使用上面的数据运行一下。<br>可以在终端中看到一直在循环输出3。<br>出现这个问题原因就处在int() 这个取整的操作他不是我们理解的四舍五入，而是简单的截取整数部分。<br>看下面的例子。</p>
+<pre><code>a = 5.4
+b = 5.5
+c = 5.6
+print(int(a))
+print(int(b))
+print(int(c))</code></pre><p>运行后输出为：</p>
+<pre><code>5
+5
+5</code></pre><p>为了解决这个问题我们只需要给要取整的数加一个0.5即可。<br>上面的例子修改为：</p>
+<pre><code>a = 5.4
+b = 5.5
+c = 5.6
+print(int(a + 0.5))
+print(int(b + 0.5))
+print(int(c + 0.5))</code></pre><p>运行后输出为：</p>
+<pre><code>5
+6
+6</code></pre><p>所以上面的二分查找也就可以修改成：</p>
+<pre><code>def binary_search(list, item):
+    low =  0
+    high = len(list)
+    while low &lt;= high:
+        mid = int((low + high) / 2 + 0.5)  # 为了实现四舍五入加上一个0.5
+        guess = list[mid]
+        if guess == item:
+            return mid
+        if guess &gt; item:
+            high = mid - 1
+        else:
+            low = mid - 1
+    return None</code></pre><p>这样解决了二分查找中的这个小问题。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.jiangyue0013.com/2019/05/16/一个二分查找的小问题--由python四舍五入引起/" data-id="cjxv157sx0000j473lbtqhnf4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Leetcode/">Leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queryset/">Queryset</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Leetcode/" style="font-size: 10px;">Leetcode</a> <a href="/tags/Queryset/" style="font-size: 10px;">Queryset</a> <a href="/tags/algorithm/" style="font-size: 10px;">algorithm</a> <a href="/tags/django/" style="font-size: 16.67px;">django</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/爬虫/" style="font-size: 13.33px;">爬虫</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/08/从Django部署中学到的/">从Django部署中学到的</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/03/升级python版本和搭建环境/">&#39;升级python版本和搭建环境&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/02/运行Django项目出现RuntimeError错误的解决方法。/">&#39;运行Django项目出现RuntimeError错误的解决方法。&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/02/八大排序算法使用python实现/">&#39;八大排序算法使用python实现&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/30/Django中Queryset的使用（一）/">&#39;Django中Queryset的使用（一）&#39;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Jiang Yue<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

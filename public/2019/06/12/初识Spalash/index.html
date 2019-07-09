@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>初识Spalash | 姜悦的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="输入下面命令运行splash： docker run -p 8050:8050 scrapinghub/splash一个splash的基本实例： function main(splash, args)     splash:go(&amp;quot;http://www.baidu.com&amp;quot;)     splash:wait(0.5)     lcoal title = splash:evalj">
+<meta name="keywords" content="爬虫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识Spalash">
+<meta property="og:url" content="http://www.jiangyue0013.com/2019/06/12/初识Spalash/index.html">
+<meta property="og:site_name" content="姜悦的博客">
+<meta property="og:description" content="输入下面命令运行splash： docker run -p 8050:8050 scrapinghub/splash一个splash的基本实例： function main(splash, args)     splash:go(&amp;quot;http://www.baidu.com&amp;quot;)     splash:wait(0.5)     lcoal title = splash:evalj">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-08T13:23:55.099Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初识Spalash">
+<meta name="twitter:description" content="输入下面命令运行splash： docker run -p 8050:8050 scrapinghub/splash一个splash的基本实例： function main(splash, args)     splash:go(&amp;quot;http://www.baidu.com&amp;quot;)     splash:wait(0.5)     lcoal title = splash:evalj">
+  
+    <link rel="alternate" href="/atom.xml" title="姜悦的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">姜悦的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">这世界唯一不变的事情就是这世界一直在改变。</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.jiangyue0013.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-初识Spalash" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/12/初识Spalash/" class="article-date">
+  <time datetime="2019-06-12T04:15:11.000Z" itemprop="datePublished">2019-06-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      初识Spalash
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>输入下面命令运行splash：</p>
+<pre><code>docker run -p 8050:8050 scrapinghub/splash</code></pre><p>一个splash的基本实例：</p>
+<pre><code>function main(splash, args)
+    splash:go(&quot;http://www.baidu.com&quot;)
+    splash:wait(0.5)
+    lcoal title = splash:evaljs(&quot;document.title&quot;)
+    return {title=title}
+end</code></pre><p>将上面实例复制到 localhost:8050 的代码编辑区域，并将网址设为 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a></p>
+<p>点击Render me！返回 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a> 的title</p>
+<p>我们在这里定义的方法名称为main()，这个名称是固定的，Splash会根据这个名字执行。</p>
+<ul>
+<li>入口及返回值</li>
+</ul>
+<p>该方法的返回值既可以是字典形式，也可以是字符串形式，最后都会转化为Splash HTTP Response。</p>
+<ul>
+<li>异步处理</li>
+</ul>
+<p>Splash支持异步处理，但是这里没有显式指明回调方法，其回调实在Splash内部完成的。</p>
+<p>示例如下：</p>
+<pre><code>function main(splash, args)
+    local example_urls = {&quot;www.baidu.com&quot;, &quot;www.taobao.com&quot;, &quot;www.zhihu.com&quot;}
+    local urls = args.urls or example_urls
+    local results  = {}
+    for index, url in ipairs(urls) do
+        local ok, reason = splash:go(&quot;http://&quot; .. url)
+        if ok then
+            splash:wait(2)
+            results[url] = splash:png()
+        end
+    end
+    return results
+end</code></pre><p>上面实例运行结果为，三个网站的的截图。<br>在脚本内调用的wait()方法类似与sleep()。其参数为等待的秒数。</p>
+<p>“..”为拼接字符串。</p>
+<h3 id="Splash对象属性"><a href="#Splash对象属性" class="headerlink" title="Splash对象属性"></a>Splash对象属性</h3><ul>
+<li>args</li>
+</ul>
+<p>该属性可以获取加载时配置的参数，比如URL，</p>
+<p>如果为GET请求，它还可以获取GET请求参数；</p>
+<p>如果为POST请求，它可以获取表单提交的数据。</p>
+<p>Splash也支持使用第二个参数直接作为args，例如：</p>
+<pre><code>function main(spalsh, args)
+    local url = args.url
+end</code></pre><p>这里第二个参数args就相当于splash.args属性，以上代码等价于：<br>    function main(spalsh)<br>        local url = splash.args.url<br>    end</p>
+<ul>
+<li>js_enable</li>
+</ul>
+<p>这个属性是Splash的JavaScript执行开关，可以将其配置为true或false来控制是否执行JavaScript代码，默认为true.</p>
+<p>一般不用设置此属性，默认开启。</p>
+<ul>
+<li>resource_timeout</li>
+</ul>
+<p>顾名思义，此属性设置加载的超时时间，单位为秒。如果设置为0或者nil(类似python中的None)，代表不检测超时。</p>
+<p>此属性用于加载速度较慢的情况，避免给一直等待，超过时间无响应，直接抛出异常忽略即可。</p>
+<ul>
+<li>image_enable</li>
+</ul>
+<p>顾名思义，设置图片是否加载，默认情况加载。禁用之后可以节省网络流量并提高加载速度。</p>
+<p>注意，禁用图片加载可能会影响JavaScript渲染。因为禁用图片加载后，它的外层DOM节点的高度会发生变化，进而影响</p>
+<p>DOM节点的位置。若JavaScript对图片节点有操作的话，其执行就会有影响。</p>
+<p>初次之外Splash使用了缓存，一开始缓存了图片，然后禁用了图片加载。再进行加载图片还会出现，此时重启Splash即可</p>
+<p>。</p>
+<ul>
+<li>plugins_enable</li>
+</ul>
+<p>此属性控制浏览器插件（如Flash插件）是否开启。默认false，不开启。</p>
+<ul>
+<li>scroll_position</li>
+</ul>
+<p>通过设置此属性来控制页面上下或左右滚动。<br>示例如下：</p>
+<pre><code>function main(splash, args)
+    assert(splash:go(&quot;https://www.taobao.com&quot;))
+    splash.scroll_position = {y=400}
+    return {png = splash:png()}
+end</code></pre><p>这样我们可以控制页面向下滚动400像素。</p>
+<h3 id="Splash对象方法"><a href="#Splash对象方法" class="headerlink" title="Splash对象方法"></a>Splash对象方法</h3><ul>
+<li>go()</li>
+</ul>
+<p>该方法用来请求某个链接，也可以模拟GET和POST请求，同时支持传入请求头、表单等数据，其用法如下：</p>
+<pre><code>ok, reason = splash:go{url, baseurl=nil, http_method=&quot;GET&quot;, body=nil, formdata=nil}</code></pre><p>其参数说明如下：</p>
+<ol>
+<li><p>url：请求的URL。</p>
+</li>
+<li><p>baseurl：可选参数，默认为空，表示资源加载相对路径。</p>
+</li>
+<li><p>headers：可选参数，默认为空，表示请求头。</p>
+</li>
+<li><p>http_method：可选参数，默认为GET，同时支持POST。</p>
+</li>
+<li><p>body：可选参数，默认为空，发POST请求时的表单数据，使用的Content-type为application/json。</p>
+</li>
+<li><p>formdata：可选参数，默认为空，POST请求时的表单数据，使用的Content-type为application/x-www-form-urlencoded</p>
+</li>
+</ol>
+<p>该方法的返回结果是结果ok和原因reason的组合，如果ok为空，代表网页加载出现了错误，此时reason变量包含了错误的原因，否则证明页面加载成功。</p>
+<p>示例如下：</p>
+<pre><code>function main(splash, args)
+    local ok, reason = splash:go{&quot;http://httpbin.org/post&quot;, http_method=&quot;POST&quot;, body=&quot;name=Germy&quot;}
+    if ok then
+        return splash:html()
+    end
+end</code></pre><ul>
+<li>wait()</li>
+</ul>
+<p>此方法可以控制页面等待时间使用方法如下：<br>ok, reason = splash:wait(time, cancel_on_redirect=false, cancel_on_error=true)</p>
+<p>参数说明如下：</p>
+<ol>
+<li>time：等待的秒数。</li>
+<li>cancel_on_redirect：可选参数默认为false，表示如果发生重定向就停止等待，并返回重定向的结果。</li>
+<li>cancel_on_error：可选参数，默认为false，表示如果发生了加载错误，就停止等待。</li>
+</ol>
+<p>返回结果也是ok和reason的组合。</p>
+<ul>
+<li>jsfunc()</li>
+</ul>
+<p>此方法可以直接调用JavaScript定义的方法，但是所调用的方法需要用双中括号包围，这相当于实现了JavaScript方法到Lua脚本的转换。</p>
+<ul>
+<li>evaljs()</li>
+</ul>
+<p>此方法可以执行JavaScript代码并返回最后一条JavaScript语句的返回结果，使用方法如下：</p>
+<pre><code>result = splash:evaljs(js)</code></pre><ul>
+<li>runjs()</li>
+</ul>
+<p>此方法可以执行JavaScript代码，它与evaljs()的功能类似，但是更偏向于执行某些动作或声明某些方法。</p>
+<ul>
+<li>autoload()</li>
+</ul>
+<p>此方法可以设置每个页面访问时自动加载的对象，使用发放如下：</p>
+<pre><code>ok, reason = splash:autoload{source_or_url, source=nil, url=nil}</code></pre><p>参数说明如下：</p>
+<ol>
+<li>source_or_url：JavaScript代码或者JavaScript库链接。</li>
+<li>source：JavaScript代码</li>
+<li>url：JavaScript库链接</li>
+</ol>
+<p>此方法只负责加载JavaScript代码或库，不执行任何操作。执行操作的话，需要调用evaljs()或runjs()方法。</p>
+<ul>
+<li>call_later()</li>
+</ul>
+<p>此方法可以通过设置定时任务和延迟时间来实现任务延时执行，并且可以在执行前通过cancel()方法重新执行定时任务。</p>
+<p>示例如下：</p>
+<pre><code>function main(splash, args)
+    local snapshots = {}
+    local timer = splash:call_later(function()
+        snapshots[&quot;a&quot;] = splash:png()
+        splash:wait(1.0)
+        snapshots[&quot;b&quot;] = splash:png()
+    end, 0.2)
+    splash:go(&quot;https://www.taobao.com&quot;)
+    splash:wait(3.0)
+    return snapshots
+end</code></pre><ul>
+<li>http_get()</li>
+</ul>
+<p>此方法可以模拟发送HTTP的GET请求，使用方法如下：</p>
+<pre><code>response = splash:http_get{url, headers=nil, follow_redirects=true}</code></pre><p>参数说明如下：</p>
+<ol>
+<li>url：请求URL</li>
+<li>headers：可选参数，默认为空，请求头。</li>
+<li>follow_redirects：可选参数，表示是启动自动重定向，默认为true。</li>
+</ol>
+<ul>
+<li>http_post()</li>
+</ul>
+<p>此方法用来模拟发送POST请求，使用方法如下：</p>
+<pre><code>response = splash:http_post{url, headers=nil, follow_redirects=true, body=nil}</code></pre><p>参数说明如下：</p>
+<ol>
+<li>url：请求URL。</li>
+<li>headers：可选参数，默认为空，请求头。</li>
+<li>follow_redrects：可选参数，表示是否启动自动重定向，默认为true</li>
+<li>body：可选参数，即表单数据，默认为空</li>
+</ol>
+<ul>
+<li>set_content()</li>
+</ul>
+<p>此方法用来设置页面的内容，示例如下：</p>
+<pre><code>function main(splash, args)
+    assert(splash:set_content(&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;hello&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;))
+    return splash:png()
+end</code></pre><ul>
+<li>html()</li>
+</ul>
+<p>此方法用来获得网页的源代码</p>
+<ul>
+<li>png()</li>
+</ul>
+<p>此方法用来获取PNG格式的网页截图。</p>
+<ul>
+<li>jpeg()</li>
+</ul>
+<p>此方法用来获取JPEG格式的网页截图。</p>
+<ul>
+<li>har()</li>
+</ul>
+<p>此方法用来获得页面加载过程描述</p>
+<ul>
+<li>url()</li>
+</ul>
+<p>此方法可以获取当前正在访问的URL</p>
+<ul>
+<li>get_cookies()</li>
+</ul>
+<p>此方法可以获取当前页面的Cookies。</p>
+<ul>
+<li>add_cookies()</li>
+</ul>
+<p>此方法可以为当前页面添加Cookies。</p>
+<ul>
+<li>clear_cookies()</li>
+</ul>
+<p>此方法可以清除所有的Cookies。</p>
+<ul>
+<li>get_viewport_size()</li>
+</ul>
+<p>此方法可以获取当前浏览器页面的大小。</p>
+<ul>
+<li>set_viewport_size()</li>
+</ul>
+<p>此方法可以设置当前浏览器页面的大小</p>
+<ul>
+<li>set_viewport_full()</li>
+</ul>
+<p>此方法可以设置浏览器全屏显示</p>
+<ul>
+<li>set_uer_agent()</li>
+</ul>
+<p>此方法可以设置浏览器的User-Agent。</p>
+<ul>
+<li>set_custom_headers()</li>
+</ul>
+<p>此方法可以设置请求头</p>
+<ul>
+<li>select()</li>
+</ul>
+<p>该方法可以选中符合条件的第一个节点，如果有多个节点符合条件，则只会返回一个，其参数时CSS选择器。</p>
+<ul>
+<li>select_all()</li>
+</ul>
+<p>此方法可以选中所有符合条件的节点，其参数是CSS选择器。</p>
+<ul>
+<li>mouse_click()</li>
+</ul>
+<p>此方法可以模拟鼠标点击操作，传入的参数为坐标值的x 和y。此外，也可以直接选中某个节点，然后调用此方法。</p>
+<h3 id="Splash-API调用"><a href="#Splash-API调用" class="headerlink" title="Splash API调用"></a>Splash API调用</h3><p>与python结合调用。</p>
+<ul>
+<li><p>render.html<br>此接口用于获取JavaScript渲染的页面的HTML代码，接口地址就是Splash的运行地址加此接口名称，<br>例如 :</p>
+<p>  <a href="http://localhost:8050/render.html?url=https://www.baidu.com" target="_blank" rel="noopener">http://localhost:8050/render.html?url=https://www.baidu.com</a></p>
+</li>
+</ul>
+<p>我们给此接口传递了一个url参数来指定渲染的URL，返回结果即页面渲染后的源代码。</p>
+<ul>
+<li>render.png</li>
+</ul>
+<p>此接口可以获取网页截图，通过width和heigh来控制宽高，返回PNG格式的图片二进制数据。示例如下：</p>
+<pre><code>curl http://localhost:8050/rnder.png?url=https://www.taobao.com&amp;wait=5&amp;width=1000&amp;height=700</code></pre><ul>
+<li>render.jpeg</li>
+</ul>
+<p>此接口接口返回jpeg格式的网页截图。参数quality用来设置图片质量。</p>
+<ul>
+<li>render.har</li>
+</ul>
+<p>此接口用于获取页面加载的HAR数据，示例如下：</p>
+<pre><code>curl http://localhost:8050/render.har?url=https://www.jd.com&amp;wait=5</code></pre><ul>
+<li>render.json</li>
+</ul>
+<p>此接口包含了前面接口的所有功能，返回结果是JSON格式。</p>
+<ul>
+<li>execute</li>
+</ul>
+<p>此接口是最为强大的接口，实现了与Lua脚本的对接。</p>
+<h3 id="Splash负载均衡设置"><a href="#Splash负载均衡设置" class="headerlink" title="Splash负载均衡设置"></a>Splash负载均衡设置</h3><p>负载均衡的目的就是为了多个服务器分担压力。<br>假设四台服务器哦IP地址为：</p>
+<ul>
+<li>127.0.0.1</li>
+<li>127.0.0.2</li>
+<li>127.0.0.3</li>
+<li>127.0.0.4</li>
+</ul>
+<p>四台服务器的Splash均通过dockers的splash镜像在端口：8050开启服务。<br>选择任意一台带有公网IP的主机来配置负载均衡。</p>
+<p>首先在服务器安装Nginx。</p>
+<p>修改Nginx的配置文件nginx.conf，添加如下内容：</p>
+<pre><code>http {
+    upstream splash {  # 服务器集群名为splash
+        least_conn;  
+        # 代表最少链接负载均衡，去掉此行将使用默认的轮询策略实现负载均衡
+        # 若使用ip_hash，此方法确保同一服务器响应请求，此方法适合有状态的服务。
+        # Splash不需要应用此设置。
+        server 127.0.0.1:8050;
+        # 还可以添加weight参数设置权值，权值越高分配到的请求越多。
+        server 127.0.0.2:8050;
+        server 127.0.0.3:8050;
+        server 127.0.0.4:8050;
+    }
+    server {
+        listen 8050;
+        location / {
+            proxy_pass http://splash;
+            # 设置下面两行来进行用户认真。
+            auth_basic &quot;Restricted&quot;;
+            auth_baseic_user_file /etc/nginx/conf.d/.htpasswd;
+        }
+    }
+}</code></pre><p>上面用户认证的用户名和密码配置放置在 /etc/nginx/conf.d 目录下，我们需要使用htpasswd命令创建。</p>
+<p>例如，创建一个用户名为admin的文件，相关命令如下：</p>
+<pre><code>htpasswd -c .htpasswd admin</code></pre><p>之后输入两次密码即可。</p>
+<p>配置完成后需要重启Nginx服务。</p>
+<p>测试文件在</p>
+<pre><code>./test_load_balance.py</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.jiangyue0013.com/2019/06/12/初识Spalash/" data-id="cjxv157uo0015j4738kcotfnw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/06/13/《算法图解》第四章第一节练习/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          《算法图解》第四章第一节练习
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/05/16/一个二分查找的小问题--由python四舍五入引起/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">一个二分查找的小问题--由python四舍五入引起</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Leetcode/">Leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queryset/">Queryset</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Leetcode/" style="font-size: 10px;">Leetcode</a> <a href="/tags/Queryset/" style="font-size: 10px;">Queryset</a> <a href="/tags/algorithm/" style="font-size: 10px;">algorithm</a> <a href="/tags/django/" style="font-size: 16.67px;">django</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/爬虫/" style="font-size: 13.33px;">爬虫</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/08/从Django部署中学到的/">从Django部署中学到的</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/03/升级python版本和搭建环境/">&#39;升级python版本和搭建环境&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/02/运行Django项目出现RuntimeError错误的解决方法。/">&#39;运行Django项目出现RuntimeError错误的解决方法。&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/02/八大排序算法使用python实现/">&#39;八大排序算法使用python实现&#39;</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/30/Django中Queryset的使用（一）/">&#39;Django中Queryset的使用（一）&#39;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Jiang Yue<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
