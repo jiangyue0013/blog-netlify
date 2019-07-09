@@ -82,7 +82,7 @@ deploy:
   repo: https://github.com/jiangyue0013/jiangyue0013.github.io
   branch: master
 
-# diqus设置
+# disqus设置
 disqus:
   enable: true
   shortname: jiangyue0013
