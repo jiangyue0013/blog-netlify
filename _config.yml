@@ -82,5 +82,8 @@ deploy:
   repo: https://github.com/jiangyue0013/jiangyue0013.github.io
   branch: master
 
-# 填写你自己的 shortname
-disqus_shortname: jiangyue0013
+# diqus设置
+disqus:
+  enable: true
+  shortname: jiangyue0013
+  count: true
