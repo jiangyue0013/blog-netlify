@@ -5,7 +5,7 @@
 # Site
 title: 姜悦的博客
 subtitle: 这世界唯一不变的事情就是这世界一直在改变。
-description:
+description: 姜悦的博客
 keywords:
 author: Jiang Yue
 language: zh-CN
@@ -85,5 +85,5 @@ deploy:
 # disqus设置
 disqus:
   enable: true
-  shortname: jiangyue0013
+  shortname: jiangyue0013hexo
   count: true
